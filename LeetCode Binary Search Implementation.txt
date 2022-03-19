@@ -1,0 +1,47 @@
+public class MyClass {
+    public static int binarySearchRecursive(int[] array, int key, int low, int high) {
+        //int mid = (low+high)/2; 
+        int mid = low+(high-low)/2;
+        if (key == array[mid]) {
+            return mid;
+        }
+        if (key > array[mid]) { //search right side
+            return binarySearchRecursive(array, key, mid+1, high); //must return the function
+        }
+        if (key < array[mid]) { //search left side
+            return binarySearchRecursive(array, key, low, mid-1); //must return the function
+        }
+        return -1; //key not found
+    }
+    public static int binarySearchIterative(int[] array, int key, int low, int high) {
+        while(low <= high) { //careful, this needs to be <= in the case that key is the first or last element
+            //int mid = (low+high)/2; 
+            int mid = low+(high-low)/2;
+            if (key == array[mid]) {
+                return mid;
+            }
+            if (key > array[mid]) { //search right side
+                low = mid+1;notepad
+            }
+            if (key < array[mid]) { //search left side
+                high = mid-1;
+            }
+        }
+        return -1; //key not found 
+    }
+    public static void main(String args[]) {
+        int[] array = {1,2,3,4,5,6,7,8,9};
+        int low = 0;
+        int high = array.length-1;
+        System.out.println(binarySearchRecursive(array, 3, low, high));
+        System.out.println(binarySearchIterative(array, 3, low, high));
+        System.out.println(binarySearchRecursive(array, 1, low, high));
+        System.out.println(binarySearchIterative(array, 1, low, high));
+        System.out.println(binarySearchRecursive(array, 8, low, high));
+        System.out.println(binarySearchIterative(array, 8, low, high));
+        System.out.println(binarySearchRecursive(array, 9, low, high));
+        System.out.println(binarySearchIterative(array, 9, low, high));
+        System.out.println(binarySearchRecursive(array, 5, low, high));
+        System.out.println(binarySearchIterative(array, 5, low, high));
+    }
+}

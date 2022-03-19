@@ -1,0 +1,99 @@
+public class CustomHashMap {
+    class Node {
+        int key;
+        int val;
+        Node next;
+        Node(int key, int val) {
+            this.key = key; 
+            this.val = val;
+        }
+    }
+    int capacity = 100; //default is 16
+    Node[] array = new Node[capacity]; //array (bucket) of nodes (linked lists)
+    
+    public void put(int key, int val) {
+        int index = getIndex(key);
+        //find previous node to get reference to next node
+        Node prev = findNode(index, key);
+        //no collision
+        if (prev.next == null) {
+            prev.next = new Node(key, val);
+        }
+        //collision, update value because each key can only have one value
+        else { 
+            prev.next.val = val;
+        }
+    }
+    
+    //get value given key
+    public int get(int key) {
+        int index = getIndex(key);
+        Node prev = findNode(index, key);
+        if (prev.next == null) {
+            return -1;
+        }
+        return prev.next.val;
+    }
+    
+    //remove that node (remove that key and value pair) from the node array
+    public void remove(int key) {
+        int index = getIndex(key);
+        Node prev = findNode(index, key);
+        if (prev.next == null) {
+            return;
+        }
+        prev.next = prev.next.next; 
+    }
+    
+    public boolean containsKey(int key) {
+        int index = getIndex(key);
+        return array[index] != null;
+    }
+    
+    private Node findNode(int index, int key) {
+    	//edge case
+    	if (array[index] == null) {
+    	    //return a fake head node
+    	    //cannot return null because we need fakeNode.next to get the real head node
+    		return array[index] = new Node(-1, -1);
+    	}
+    	Node prev = array[index];
+    	//iterate to find element
+    	while (prev.next != null && prev.next.key != key) {
+    		prev = prev.next;
+    	}
+    	return prev;
+    }
+    
+    public int getIndex(int key) {
+	    return Integer.hashCode(key) % array.length;
+    }
+    
+    public void print() {
+        for (int i = 0; i < array.length; i++) { //iterate through array (buckets)
+            if (array[i] != null) {
+                Node node = array[i];
+                while (node.next != null) { //iterate through nodes in bucket
+                    node = node.next; //move to next because we have a fake head node (-1,-1) from findNode()
+                    System.out.println("{" + node.key + ", " + node.val + "}");
+                }
+            }
+        }
+    }
+    
+    public static void main(String args[]) {
+        CustomHashMap map = new CustomHashMap();
+        map.put(1, 11);
+        map.put(2, 22);
+        map.put(3, 33);
+        map.put(4, 44);
+        map.remove(4);
+        map.print();
+        System.out.println(map.get(3));
+        System.out.println(map.containsKey(3));
+    }
+}
+//https://leetcode.com/problems/design-hashmap/discuss/152746/Java-Solution
+//https://leetcode.com/problems/design-hashmap/discuss/227081/Java-Solutions
+//https://medium.com/swlh/hashmap-implementation-for-java-90a5f58d4a5b
+//https://www.devglan.com/java8/hashmap-custom-implementation-java

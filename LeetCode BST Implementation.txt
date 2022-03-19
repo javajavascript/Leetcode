@@ -1,0 +1,231 @@
+import java.util.*;
+public class CustomTree {
+    class Node {
+        int val;
+        Node left;
+        Node right;
+        Node(int val) {
+            this.val = val;
+        }
+    }
+    Node root;
+    //we need the add function because we cannot pass "root" into
+    //addRecursive from the main method, it won't change "root"
+    //the sample logic applies to all other methods
+    public void add(int val) {
+        root = addRecursive(root, val);
+    }
+    public Node addRecursive(Node node, int val) {
+        if (node == null) {
+            Node nodeNew = new Node(val);
+            return nodeNew;
+        }
+        if (val < node.val) {
+            node.left = addRecursive(node.left, val);
+        }
+        if (val > node.val) {
+            node.right = addRecursive(node.right, val);
+        }
+        return node;
+    }
+    public void remove(int val) {
+        root = removeRecursive(root, val);
+    }
+    public Node removeRecursive(Node node, int val) {
+        if (node == null) {
+            return null;
+        }    
+        if (val < node.val) {
+            node.left = removeRecursive(node.left, val);
+        }
+        if (val > node.val) {
+            node.right = removeRecursive(node.right, val);
+        }
+        if (val == node.val) {
+            if (node.left != null && node.right != null) { //if node to remove has 2 children
+                //2 ways to do this, replace node with max element on left side or min element on right side
+                Node temp = node;
+                //find min element on right side
+                Node minValueRight = findMinRecursive(temp.right);
+                node.val = minValueRight.val;
+                //update pointers on right side of tree
+                node.right = removeRecursive(node.right, minValueRight.val);
+            }
+            else if (node.left != null) { //if node only has a left child
+                node = node.left; //replace node with its left child so that the parent node points at the left child now
+            }
+            else if (node.right != null) { //if node only has a right child 
+                node = node.right; //replace node with its right child so that the parent node points at the right child now
+            } 
+            else { //if node is a leaf node
+                node = null;
+            }
+        }
+        return node;
+    }
+    public int findMin() {
+        return findMinRecursive(root).val;
+    }
+    public Node findMinRecursive(Node node) {
+        if (node.left == null) {
+            return node; //no left leaf means node is min element
+        }
+        return findMinRecursive(node.left);
+    }
+    public int findMax() {
+        return findMaxRecursive(root).val;
+    }
+    public Node findMaxRecursive(Node node) {
+        if (node.right == null) {
+            return node; //no right leaf means node is max element
+        }
+        return findMaxRecursive(node.right);
+    }
+    public boolean contains(int val) {
+        return containsRecursive(root, val);
+    }
+    public boolean containsRecursive(Node node, int val) {
+        if (node == null) {
+            return false;
+        }
+        if (val < node.val) {
+            return containsRecursive(node.left, val);
+        }
+        if (val > node.val) {
+            return containsRecursive(node.right, val);
+        }
+        return true; //val == node.val
+    }
+    public int maxDepth() {
+        return maxDepthRecursive(root);
+    }
+    public int maxDepthRecursive(Node node) {
+        if (node == null) {
+            return 0; //*
+        }
+        int left = maxDepthRecursive(node.left);
+        int right = maxDepthRecursive(node.right);
+        return Math.max(left,right)+1; //**
+    }
+    //* when we reach the bottom of the tree (leaf nodes), we reach the root == null condition and return 0
+    //** when we reach the Math.max statement we are at the second lowest level of the tree, so we add 1 because... 
+    //we are one level higher than the leaf nodes which have a height of 0, then we recursively add 1 to get the height of the tree
+    public void invert() {
+        invertRecursive(root);
+    }
+    public void invertRecursive(Node node) {
+        if (node == null) {
+            return; 
+        }
+        Node temp = node.left;
+        node.left = node.right;
+        node.right = temp;
+        invertRecursive(node.left);
+        invertRecursive(node.right);
+    }
+    public boolean isSymmetric() {
+        return isSymmetric(root);
+    }
+    public boolean isSymmetric(Node node) {
+        if (node == null) {
+            return true;
+        }
+        return isSymmetric(node.left, node.right);
+    }
+    
+    public boolean isSymmetric(Node left, Node right) {
+        if (left == null && right == null) {
+            return true; //if both sides of the tree are same length
+        }
+        if (left == null || right == null) {
+            return false; //if one side of the tree is shorter than the other
+        }
+        if (left.val != right.val) {
+            return false; //if left and right values aren't the same
+        }
+        return isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
+
+    }
+    public void printLevelOrder() {
+        List<List<Integer>> list = new ArrayList<List<Integer>>();
+        createLevelOrder(list, root, 0); 
+        System.out.println(list);
+    }
+    public void createLevelOrder(List<List<Integer>> list, Node node, int height) {
+        if (node == null) {
+            return;
+        }
+        if (list.size() == height) {
+            list.add(new ArrayList<Integer>()); 
+        }
+        list.get(height).add(node.val);
+        createLevelOrder(list, node.left, height+1);
+        createLevelOrder(list, node.right, height+1);
+    }
+    public void printInorder() {
+        List<Integer> list = new ArrayList<Integer>();
+        createInorder(root, list);
+        System.out.println(list);
+    }
+    public void createInorder(Node node, List<Integer> list) {
+        if (node == null) {
+            return;
+        }
+        createInorder(node.left, list); 
+        list.add(node.val);
+        createInorder(node.right, list);
+    }
+    public void printPreorder() {
+        List<Integer> list = new ArrayList<Integer>();
+        createPreorder(root, list);
+        System.out.println(list);
+    }
+    public void createPreorder(Node node, List<Integer> list) {
+        if (node == null) {
+            return;
+        }
+        list.add(node.val);
+        createPreorder(node.left, list); 
+        createPreorder(node.right, list);
+    }    
+    public void printPostorder() {
+        List<Integer> list = new ArrayList<Integer>();
+        createPostorder(root, list);
+        System.out.println(list);
+    }
+    public void createPostorder(Node node, List<Integer> list) {
+        if (node == null) {
+            return;
+        }
+        createPostorder(node.left, list); 
+        createPostorder(node.right, list);
+        list.add(node.val);
+    }    
+    public static void main(String args[]) {
+        CustomTree tree = new CustomTree();
+        tree.add(5);
+        tree.add(6);
+        tree.add(4);
+        tree.add(3);
+        tree.add(2);
+        tree.remove(2);
+        tree.printLevelOrder();
+        tree.printInorder();
+        tree.printPreorder();
+        tree.printPostorder();
+        System.out.println("contains 5 = " + tree.contains(5));
+        System.out.println("contains 3 = " + tree.contains(3));
+        System.out.println("contains 55 = " + tree.contains(55));
+        System.out.println("min = " + tree.findMin());
+        System.out.println("max = " + tree.findMax());
+        System.out.println("max depth = " + tree.maxDepth());
+        System.out.println("symmetric = " + tree.isSymmetric());
+        tree.invert();
+        tree.printLevelOrder();
+        tree.printInorder();
+        tree.printPreorder();
+        tree.printPostorder();
+    }
+}
+//https://www.baeldung.com/java-binary-tree
+//https://java2blog.com/how-to-delete-node-from-binary-search-tree-java/
